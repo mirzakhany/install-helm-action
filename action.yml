@@ -1,0 +1,44 @@
+name: 'Install helm and kubectl'
+description: 'Install selected version of helm and kubectl'
+inputs:
+  helm_version:
+    description: 'helm version, will use latest version if not provided'
+    required: false
+  kubectl_version:
+    description: 'kubectl version, will use latest version if not provided'
+    required: false
+  k8s_config:
+    description: |-
+      K8S config to use for authentication. This should be the Yaml
+      formatted k8s config. The
+      value nett to be base64-encoded.
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        if [ -z "${{ inputs.kubectl_version }}" ]
+        then
+          KUBECTL_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+        else
+          KUBECTL_VERSION=${{ inputs.kubectl_version }}
+        fi
+
+        if [ -z "${{ inputs.helm_version }}" ]
+        then
+          HELM_VERSION=$(curl -Ls https://github.com/helm/helm/releases | grep 'href="/helm/helm/releases/tag/v3.[0-9]*.[0-9]*\"' | sed -E 's/.*\/helm\/helm\/releases\/tag\/(v[0-9\.]+)".*/\1/g' | head -1)
+        else
+          HELM_VERSION=${{ inputs.helm_version }}
+        fi
+
+        sudo wget -O /usr/local/bin/kubectl https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl"
+        sudo chmod +x /usr/local/bin/kubectl
+
+        sudo wget -q https://get.helm.sh/helm-${{ env.HELM_VERSION }}-linux-amd64.tar.gz -O - | tar -xzO linux-amd64/helm > /usr/local/bin/helm
+        sudo chmod +x /usr/local/bin/helm
+
+        mkdir -p $HOME/.kube
+        echo "${{ inputs.k8s_config }}" | base64 -d > $HOME/.kube/config
+        export KUBECONFIG=$HOME/.kube/config
