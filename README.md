@@ -28,7 +28,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: mirzakhany/helm-install-action@v1
+      - uses: mirzakhany/install-helm-action@v1
         with:
           k8s_config: ${{ secrets.K8S_CONFIG_B64 }}
 
