@@ -33,7 +33,7 @@ runs:
           HELM_VERSION=${{ inputs.helm_version }}
         fi
 
-        sudo wget -O /usr/local/bin/kubectl https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl"
+        sudo wget -O /usr/local/bin/kubectl https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl
         sudo chmod +x /usr/local/bin/kubectl
 
         sudo wget -q https://get.helm.sh/helm-${{ env.HELM_VERSION }}-linux-amd64.tar.gz -O - | tar -xzO linux-amd64/helm > /usr/local/bin/helm
